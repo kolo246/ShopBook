@@ -46,5 +46,5 @@ password = $db_password
 ```
 ```bash
 ## Run Spring boot application using Maven Wrapper or simply run ShopApplication.java class
-./mvnw spring-boot:run
+mvn spring-boot:run
 
