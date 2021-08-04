@@ -7,7 +7,7 @@ using Java 8, SpringBoot and Swing.
 
 - ### SpringBoot 2
 - ### Spring Data Repositories
-- ### JPA (Hibernate)
+- ### Hibernate
 - ### Swing
 - ### Flyway
 
@@ -33,8 +33,7 @@ all platforms.
 
 Flyway is an open-source database migration tool. It strongly favors simplicity and convention over configuration.
 
-###Running the application
-####On MacOS/Linux
+###Running the application on MacOS/Linux
 ```bash
 ##Run Docker container with PostgreSQL
 sudo docker run --name $container_name -e POSTGRES_PASSWORD=$db_password -d
