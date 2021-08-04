@@ -33,13 +33,13 @@ all platforms.
 
 Flyway is an open-source database migration tool. It strongly favors simplicity and convention over configuration.
 
-### Running the application on MacOS/Linux
+### Running the application on macOS/Linux
 ```bash
 ##Run Docker container with PostgreSQL
 sudo docker run --name $container_name -e POSTGRES_PASSWORD=$db_password -d
 ```
 ```bash
-##Database acces
+##Database access
 jdbc:postgresql://localhost:5432/postgres
 username = postgres
 password = $db_password
@@ -47,4 +47,3 @@ password = $db_password
 ```bash
 ## Run Spring boot application using Maven Wrapper or simply run ShopApplication.java class
 mvn spring-boot:run
-
