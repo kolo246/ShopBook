@@ -21,5 +21,8 @@ CREATE TABLE orders
 (
     id      serial primary key,
     user_id integer,
-    book_id integer
+    items   integer,
+    CONSTRAINT fk_user
+        FOREIGN KEY (user_id)
+            REFERENCES users (id)
 );

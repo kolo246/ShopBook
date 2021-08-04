@@ -19,9 +19,7 @@ public class GUIMain {
         butAddBook.addActionListener(e -> layout("Add Book", new GUIAddBook().getPanelAddBook()));
         butBuyBook.addActionListener(e -> layout("Buy Book", new GUIBuy().getPanelBuyBook()));
         butClose.addActionListener(e -> {
-            JComponent component = (JComponent) e.getSource();
-            Window win = SwingUtilities.getWindowAncestor(component);
-            win.dispose();
+            System.exit(0);
         });
     }
 

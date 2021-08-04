@@ -1,7 +1,7 @@
 package com.example.shop.gui;
 
 import com.example.shop.config.ServiceContext;
-import com.example.shop.model.Users;
+import com.example.shop.entity.Users;
 import com.example.shop.service.users.UsersService;
 
 import javax.swing.*;

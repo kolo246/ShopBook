@@ -1,16 +1,15 @@
 package com.example.shop.gui;
 
 import com.example.shop.config.ServiceContext;
-import com.example.shop.model.Books;
-import com.example.shop.model.Users;
+import com.example.shop.entity.Books;
+import com.example.shop.entity.Orders;
+import com.example.shop.entity.Users;
 import com.example.shop.service.books.BooksService;
+import com.example.shop.service.orders.OrdersService;
 import com.example.shop.service.users.UsersService;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,15 +27,15 @@ public class GUIBuy {
     private JButton butDeleteItem;
     private UsersService usersService;
     private BooksService booksService;
+    private OrdersService ordersService;
     private Users user;
     private Books book;
+    private Orders order;
     private final List<Books> cart = new ArrayList<>();
 
     public GUIBuy() {
+        initServices();
         searchBookButton.addActionListener(e -> {
-            booksService = (BooksService) ServiceContext.getBeanService(BooksService.class);
-            usersService = (UsersService) ServiceContext.getBeanService(UsersService.class);
-
             Optional<Users> foundUser = usersService.findBySurnameAndPhone(textSurname.getText(), textPhone.getText());
             Optional<Books> foundBook = booksService.findByIsbn(Integer.parseInt(textISBN.getText()));
             if (!foundUser.isPresent()) {
@@ -54,9 +53,10 @@ public class GUIBuy {
             JOptionPane.showMessageDialog(new JFrame("Info"), infoBook + "\n" + infoUser);
         });
         addToCartButton.addActionListener(e -> {
+            clearTextArea();
             if (book.getQuantity() < 1) {
                 JOptionPane.showMessageDialog(new JFrame("Info"), "Quantity of book " + book.getIsbn() + " is less than 1");
-            }else {
+            } else {
                 cart.add(book);
                 double totalPrice = cart.stream().mapToDouble(Books::getPrice).sum();
                 textArea1.append("\nTotal price: " + totalPrice);
@@ -66,21 +66,25 @@ public class GUIBuy {
             }
         });
         buyButton.addActionListener(e -> {
-            if (book.getQuantity() < 1 && cart.isEmpty()) {
+            clearTextArea();
+            if (book.getQuantity() < 1) {
                 JOptionPane.showMessageDialog(new JFrame("Info"), "Quantity of book " + book.getIsbn() + " is less than 1");
-            }
-            if (cart.isEmpty() && user != null && book != null) {
+            } else if (cart.isEmpty()) {
                 cart.add(book);
                 book.setQuantity(book.getQuantity() - 1);
                 booksService.save(book);
-                showCart(cart);
-            }else {
-                for (Books b: cart){
-                    b.setQuantity(b.getQuantity()-1);
+            } else {
+                for (Books b : cart) {
+                    b.setQuantity(b.getQuantity() - 1);
                     booksService.save(b);
                 }
-                showCart(cart);
             }
+            Optional<Orders> ordersOptional = ordersService.findOrders(user.getId());
+            order = ordersOptional.orElseGet(() -> new Orders(user, cart.size()));
+            order.setItems(order.getItems() + cart.size());
+            ordersService.save(order);
+            showCart(cart);
+            cart.clear();
         });
         butDeleteItem.addActionListener(e -> {
             if (cart.isEmpty()) {
@@ -105,23 +109,51 @@ public class GUIBuy {
         return panelBuyBook;
     }
 
-    public void showTable(JTable table, String[] userRow) {
-        String[] colNames = {"Id", "Name", "Surname", "Email", "City", "Phone NUmber", "Age"};
-        DefaultTableModel model = new DefaultTableModel(colNames, 1);
-        model.addRow(colNames);
-        model.addRow(userRow);
-        table.setModel(model);
-    }
-
     public void showCart(List<Books> cart) {
         textArea1.append("\nTotal cart: ");
         for (Books b : cart) {
             textArea1.append("\nTitle: " + b.getTitle());
-            textArea1.append("\nAuthor" + b.getAuthor());
+            textArea1.append("\nAuthor: " + b.getAuthor());
             textArea1.append("\nISBN: " + b.getIsbn());
+            textArea1.append("\n");
         }
         double totalPrice = cart.stream().mapToDouble(Books::getPrice).sum();
+        totalPrice -= countDiscount(totalPrice);
         textArea1.append("\nTotal number of items: " + cart.size());
         textArea1.append("\nTotal price: " + totalPrice);
+    }
+
+    public double countDiscount(double totalPrice) {
+        double discount = 0.0;
+        int countOfItems = order.getItems();
+        if (countOfItems % 10 == 0) {
+            discount = totalPrice * 0.1;
+            JOptionPane.showMessageDialog(new JFrame("Info"), "User: " + user.getSurname() +
+                    " get discount: 10 %\n Price before discount: " + totalPrice +
+                    "\n Price after discount: " + (totalPrice - discount));
+        } else {
+            JOptionPane.showMessageDialog(new JFrame("Info"), "Add " + extraValueToGetDiscount(countOfItems)
+                    + " extra items to get DISCOUNT !!");
+        }
+        return discount;
+    }
+
+    public int extraValueToGetDiscount(int countOfItems) {
+        int temp = countOfItems;
+        while (countOfItems % 10 != 0) {
+            countOfItems++;
+        }
+        return countOfItems - temp;
+    }
+
+    public void clearTextArea() {
+        textArea1.selectAll();
+        textArea1.replaceSelection("");
+    }
+
+    public void initServices() {
+        booksService = (BooksService) ServiceContext.getBeanService(BooksService.class);
+        usersService = (UsersService) ServiceContext.getBeanService(UsersService.class);
+        ordersService = (OrdersService) ServiceContext.getBeanService(OrdersService.class);
     }
 }

@@ -5,4 +5,5 @@
     http://www.springframework.org/schema/beans/spring-beans.xsd">
     <bean id="usersService" class="com.example.shop.service.users.UsersService" abstract="true"/>
     <bean id="booksService" class="com.example.shop.service.books.BooksService" abstract="true"/>
+    <bean id="ordersService" class="com.example.shop.service.orders.OrdersService" abstract="true"/>
 </beans>

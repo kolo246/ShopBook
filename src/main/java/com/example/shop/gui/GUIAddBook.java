@@ -1,7 +1,7 @@
 package com.example.shop.gui;
 
 import com.example.shop.config.ServiceContext;
-import com.example.shop.model.Books;
+import com.example.shop.entity.Books;
 import com.example.shop.service.books.BooksService;
 
 import javax.swing.*;
